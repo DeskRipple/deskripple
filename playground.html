@@ -1,0 +1,766 @@
+<!doctype html>
+<!--
+  ============================================================================
+  DeskRipple — interactive expand-style playground (standalone).
+
+  A browser mock of a desktop folder dock: a fixed row of folders, one per
+  expand style (Grid, Fan, Column). Hover (or tap) any folder and it expands
+  into its shortcut layout, then collapses when you leave. Each folder keeps a
+  fixed style and a fixed shortcut count — 6 for every style except Fan, whose
+  arc reads best with 5. Ring and Row are not part of the row of folders.
+
+  Self-contained: no build step, no external assets (shortcut icons are emoji).
+  Open it directly, or host it next to index.html. It is intentionally a
+  separate page so it can't affect the live landing page.
+
+  ── FIDELITY NOTE ──────────────────────────────────────────────────────────
+  The layout math in <script> is a hand-port of the C# expand styles:
+    Grid   ← src/DeskRipple.App/ExpandStyles/GridExpandStyle.cs
+    Fan    ← src/DeskRipple.App/ExpandStyles/FanExpandStyle.cs
+    Column ← src/DeskRipple.App/ExpandStyles/ColumnExpandStyle.cs
+    Ring   ← src/DeskRipple.App/ExpandStyles/RingExpandStyle.cs
+    + Helpers/StripWrapMath.cs and Helpers/RingPositionMath.cs
+  The icon *positions* match the app's formulas. The blurred panel behind them
+  is an approximation (CSS backdrop-filter, not DWM acrylic), and the demo
+  "screen" is much smaller than a real desktop — so columns/rows wrap into more
+  columns/rows here than they would on a full monitor. If you tune a constant
+  in the C# styles, mirror it here or the demo drifts. Two deliberate demo-only
+  deviations: the Fan uses a fixed modest sweep (the app adapts it to the
+  shortcut count, widening up to ~140° then growing the radius) so the small
+  mock stays tidy, and icons render a touch smaller than the desktop default.
+  (Ring's port is kept for parity even though it isn't one of the row's folders;
+  the Row style is omitted entirely.)
+  ============================================================================
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DeskRipple — try the expand styles</title>
+  <meta name="description" content="Interactive preview of DeskRipple's expand styles: hover a desktop folder and watch it fan out into Grid, Fan, or Column layouts." />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#0b0e16" />
+  <link rel="canonical" href="https://deskripple.com/playground.html" />
+
+  <!-- Social / link-preview cards. og:url and og:image stay ABSOLUTE for scrapers
+       (inert when the file is opened locally, so the page stays self-contained). -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://deskripple.com/playground.html" />
+  <meta property="og:title" content="DeskRipple — try the expand styles" />
+  <meta property="og:description" content="An interactive, no-install preview of DeskRipple's expand styles — hover a desktop folder and watch it fan out into Grid, Fan, or Column." />
+  <meta property="og:image" content="https://deskripple.com/images/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="DeskRipple — a folder on the desktop fanning out into shortcut icons" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://deskripple.com/images/og-image.png" />
+  <meta name="twitter:image:alt" content="DeskRipple — a folder on the desktop fanning out into shortcut icons" />
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%237c8cff'/%3E%3Cpath d='M14 24a3 3 0 0 1 3-3h9l4 4h17a3 3 0 0 1 3 3v15a3 3 0 0 1-3 3H17a3 3 0 0 1-3-3z' fill='white'/%3E%3C/svg%3E" />
+
+  <style>
+    :root {
+      --bg:        #0b0e16;
+      --bg-soft:   #10141f;
+      --panel:     rgba(255,255,255,.04);
+      --panel-bd:  rgba(255,255,255,.10);
+      --text:      #e7eaf3;
+      --muted:     #9aa3b8;
+      --accent:    #7c8cff;
+      --accent-2:  #58e6c9;
+      --btn-ink:   #0b0e16;   /* dark text on the gradient button (shared with index.html) */
+      --radius:    16px;
+      --maxw:      1080px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 70% -10%, rgba(124,140,255,.18), transparent 60%),
+        radial-gradient(900px 500px at 10% 0%, rgba(88,230,201,.10), transparent 55%),
+        var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    a:focus-visible, button:focus-visible {
+      outline: 3px solid rgba(88,230,201,.7); outline-offset: 3px; border-radius: 8px;
+    }
+    .skip-link {
+      position: absolute; left: 14px; top: -52px; z-index: 100;
+      background: #fff; color: #0b0e16; font-weight: 700;
+      padding: 10px 14px; border-radius: 10px; transition: top .16s ease;
+    }
+    .skip-link:focus { top: 14px; }
+    #main { scroll-margin-top: 76px; }
+    #main:focus { outline: none; }
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+    /* ---- top nav ---- */
+    header {
+      position: sticky; top: 0; z-index: 10;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: rgba(11,14,22,.65);
+      border-bottom: 1px solid var(--panel-bd);
+    }
+    .nav { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.05rem; color: var(--text); }
+    .brand:hover { text-decoration: none; }
+    .brand .mark { width: 30px; height: 30px; border-radius: 9px; }
+    .nav-links { display: flex; gap: 22px; align-items: center; }
+    .nav-links a { color: var(--muted); font-size: .95rem; }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+
+    /* ---- buttons ---- */
+    .btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 13px 22px; border-radius: 12px; font-weight: 600; font-size: 1rem;
+      border: 1px solid transparent; cursor: pointer; transition: transform .12s ease, box-shadow .2s ease;
+    }
+    .btn:hover { text-decoration: none; transform: translateY(-1px); }
+    .btn-primary {
+      color: var(--btn-ink);
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 8px 30px rgba(124,140,255,.35);
+    }
+    .btn svg { width: 18px; height: 18px; }
+
+    /* ---- intro ---- */
+    .intro { text-align: center; padding: 56px 0 22px; }
+    .intro h1 {
+      font-size: clamp(2rem, 5vw, 3rem); line-height: 1.06; margin: 0 0 14px; letter-spacing: -.02em;
+      color: #cfd6e8; /* solid fallback if background-clip:text is unavailable */
+      background: linear-gradient(180deg, #fff, #b9c0d8);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .intro p { font-size: clamp(1rem, 2.2vw, 1.2rem); color: var(--muted); max-width: 620px; margin: 0 auto; }
+
+    /* ---- demo card ---- */
+    .demo { padding: 8px 0 64px; }
+    .demo-card {
+      background: var(--panel); border: 1px solid var(--panel-bd); border-radius: 22px;
+      padding: 22px; overflow: hidden;
+    }
+
+    /* The stage is a fixed logical coordinate space (matches DIPs in the app);
+       it is visually scaled to fit the card width by JS (see fit()). */
+    .stage-wrap { margin: 0 auto; position: relative; }
+    .stage {
+      position: absolute; top: 0; left: 0;
+      width: 820px; height: 560px;          /* logical size — see STAGE_W/STAGE_H */
+      transform-origin: top left;
+      border-radius: 16px; overflow: hidden;
+      background:
+        radial-gradient(900px 420px at 30% 8%, rgba(124,140,255,.20), transparent 60%),
+        radial-gradient(700px 380px at 92% 100%, rgba(88,230,201,.16), transparent 55%),
+        linear-gradient(160deg, #182033, #0c1016 70%);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.05), inset 0 60px 120px rgba(0,0,0,.25);
+      touch-action: none; user-select: none;
+    }
+    /* faint dotted "desktop" texture */
+    .stage::before {
+      content: ""; position: absolute; inset: 0; opacity: .5;
+      background-image: radial-gradient(rgba(255,255,255,.06) 1px, transparent 1.4px);
+      background-size: 26px 26px;
+      mask-image: linear-gradient(#000, rgba(0,0,0,.2));
+    }
+
+    /* a couple of dim native-looking desktop icons, just for context */
+    .desk-icon { position: absolute; width: 64px; text-align: center; opacity: .45; pointer-events: none; }
+    .desk-icon .g { width: 40px; height: 40px; margin: 0 auto 4px; border-radius: 10px; display: grid; place-items: center; font-size: 22px; background: rgba(255,255,255,.08); }
+    .desk-icon .t { font-size: 10px; color: #c7cde0; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
+
+    /* the expanded panel backdrop (approximate acrylic) */
+    .panel {
+      position: absolute; z-index: 2; pointer-events: none;
+      background: rgba(124,140,255,.07);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 18px 50px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.10);
+      backdrop-filter: blur(16px) saturate(125%);
+      -webkit-backdrop-filter: blur(16px) saturate(125%);
+      opacity: 0; transform: scale(.92);
+      transition: opacity .26s ease, transform .34s cubic-bezier(.22,1,.36,1);
+    }
+    .stage.open .panel { opacity: 1; transform: scale(1); }
+    .stage.no-anim .panel { transition: none; }
+
+    /* the folders — a fixed row, one per expand style */
+    .folder {
+      position: absolute; z-index: 5; width: 84px; text-align: center; cursor: pointer;
+      transform: translate(-50%, -50%);
+      transition: filter .2s ease, opacity .22s ease;
+    }
+    .folder .fico { width: 54px; height: 54px; margin: 0 auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,.45)); }
+    .folder .flbl { margin-top: 4px; font-size: 11px; color: #eef1f8; text-shadow: 0 1px 3px rgba(0,0,0,.7); white-space: nowrap; }
+    .folder.active .fico { filter: drop-shadow(0 8px 22px rgba(124,140,255,.55)); }
+    .folder:focus-visible { outline: none; }
+    .folder:focus-visible .fico { filter: drop-shadow(0 0 0 2px var(--accent-2)); }
+
+    /* shortcut items */
+    .item {
+      position: absolute; z-index: 10; width: 58px; pointer-events: auto; cursor: pointer;
+      will-change: transform, opacity;
+      transition: transform .42s cubic-bezier(.22,1,.36,1), opacity .3s ease;
+    }
+    .stage.no-anim .item { transition: none; }
+    .item .tile {
+      width: 42px; height: 42px; margin: 0 auto; border-radius: 12px;
+      display: grid; place-items: center; font-size: 23px; line-height: 1;
+      box-shadow: 0 6px 16px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.25);
+      transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+    }
+    .item .lbl {
+      margin-top: 5px; text-align: center; font-size: 10px; color: #e3e7f1;
+      white-space: nowrap; text-shadow: 0 1px 2px rgba(0,0,0,.7);
+      transition: color .15s ease;
+    }
+    /* hover highlight on the expanded shortcuts */
+    .item:hover { z-index: 11; }
+    .item:hover .tile {
+      transform: scale(1.12);
+      filter: brightness(1.08);
+      box-shadow: 0 10px 24px rgba(0,0,0,.5), 0 0 0 2px rgba(124,140,255,.9), inset 0 1px 0 rgba(255,255,255,.35);
+    }
+    .item:hover .lbl { color: #ffffff; }
+
+    /* ---- caption ---- */
+    .caption {
+      margin-top: 22px; font-size: .95rem; color: var(--muted); text-align: center;
+    }
+    .caption b { color: var(--text); }
+    .hint { margin-top: 4px; font-size: .85rem; color: #6f7790; text-align: center; }
+
+    .approx-note {
+      max-width: 760px; margin: 26px auto 0; font-size: .82rem; color: #6f7790; text-align: center;
+    }
+
+    footer { border-top: 1px solid var(--panel-bd); padding: 30px 0; color: var(--muted); font-size: .9rem; margin-top: 10px; }
+    .foot-row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px; align-items: center; }
+
+    @media (max-width: 640px) {
+      .nav-links a:not(:last-child) { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .item, .item .tile, .item .lbl, .panel, .folder { transition: none !important; }
+    }
+    @media (forced-colors: active) {
+      .intro h1 { -webkit-text-fill-color: currentColor; color: CanvasText; }
+    }
+  </style>
+</head>
+<body>
+
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header>
+    <div class="wrap nav">
+      <a class="brand" href="index.html">
+        <svg class="mark" viewBox="0 0 64 64" aria-hidden="true">
+          <rect width="64" height="64" rx="14" fill="#7c8cff"/>
+          <path d="M14 24a3 3 0 0 1 3-3h9l4 4h17a3 3 0 0 1 3 3v15a3 3 0 0 1-3 3H17a3 3 0 0 1-3-3z" fill="#fff"/>
+          <g fill="#7c8cff"><rect x="20" y="31" width="6" height="6" rx="1.5"/><rect x="29" y="31" width="6" height="6" rx="1.5"/><rect x="38" y="31" width="6" height="6" rx="1.5"/></g>
+        </svg>
+        DeskRipple
+      </a>
+      <nav class="nav-links">
+        <a href="index.html#features">Features</a>
+        <a href="index.html#screenshots">Screenshots</a>
+        <a href="https://github.com/DeskRipple/deskripple">GitHub</a>
+        <a href="index.html#download">Download</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+  <div class="intro wrap">
+    <h1>Try the expand styles</h1>
+    <p>A live mock of a row of DeskRipple folders — one for each expand style. <b>Hover any folder</b> (or tap it) to watch it fan out into its layout.</p>
+  </div>
+
+  <section class="demo wrap">
+    <div class="demo-card">
+      <div class="stage-wrap" id="stageWrap">
+        <div class="stage" id="stage" role="group" aria-label="Interactive expand-style demo — hover or press a folder to expand it">
+          <!-- context: a couple of faint native desktop icons -->
+          <div class="desk-icon" style="left:36px; top:30px;"><div class="g">🗑️</div><div class="t">Recycle Bin</div></div>
+          <div class="desk-icon" style="left:36px; top:120px;"><div class="g">💻</div><div class="t">This PC</div></div>
+
+          <div class="panel" id="panel"></div>
+
+          <!-- the fixed row of folders + shortcut items are injected here by JS -->
+        </div>
+      </div>
+
+      <p class="caption" id="caption" aria-live="polite"></p>
+      <p class="hint">Tip: hover each folder in turn to compare how the layouts open.</p>
+    </div>
+
+    <p class="approx-note">
+      The icon <em>positions</em> are computed with the same formulas as the real app. The blurred panel is a CSS approximation of the acrylic, and this preview screen is far smaller than a real desktop — so layouts wrap into more columns/rows here than they usually would on a full monitor.
+    </p>
+
+    <div style="text-align:center; margin-top:30px;">
+      <a class="btn btn-primary" href="index.html#download">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+        Get the DeskRipple beta
+      </a>
+    </div>
+  </section>
+  </main>
+
+  <footer>
+    <div class="wrap foot-row">
+      <div><strong style="color:var(--text)">DeskRipple</strong> · expand-style playground</div>
+      <div><a href="index.html">← Back to deskripple.com</a></div>
+    </div>
+  </footer>
+
+  <script>
+  (() => {
+    "use strict";
+
+    // ── Logical stage size (treated as DIPs, like the app's work area) ──
+    const STAGE_W = 820, STAGE_H = 560;
+
+    // App constants the C# styles are tuned around.
+    const ICON = 42;                              // shortcut icon image size (DIPs)
+    const FOLDER_CELL = { w: 66, h: 99 };         // collapsed folder-icon HWND footprint
+    const PADDING = 10;                           // FolderDockViewModel passes padding=10
+
+    // Per-style cell envelope (icon + label + margins), from each *.cs CellSize().
+    const cell      = s => s + 42;                // Fan / Column / Ring
+    const gridCell  = s => s + 32;                // Grid
+
+    // Demo-only baseline (DIPs above the folder centre): lift the up-expanding
+    // Grid and Fan so their lowest icons line up with the Column's, giving the
+    // row one shared bottom edge. Equals the Column's folder clearance
+    // (ColumnExpandStyle vOff = FOLDER_CELL.h/2 + cell/2 + 14).
+    const UP_BASELINE = FOLDER_CELL.h / 2 + cell(ICON) / 2 + 14;
+
+    // Faux shortcuts (emoji = zero external assets). Six is the most any folder
+    // shows; Fan uses the first five.
+    const APPS = [
+      { g: "🌐", c: "#3f7bff", t: "Browser"  },
+      { g: "✉️", c: "#f2655c", t: "Mail"     },
+      { g: "🎵", c: "#1db954", t: "Music"    },
+      { g: "📷", c: "#e6a13b", t: "Photos"   },
+      { g: "💬", c: "#7c5cff", t: "Chat"     },
+      { g: "📝", c: "#ffcf4d", t: "Notes"    },
+    ];
+
+    // The fixed row of folders, one per expand style shown in the demo. Ring
+    // and the Row style are not part of the row. Each folder keeps its own
+    // style and a fixed shortcut count: 6 for every style except Fan, whose arc
+    // reads best with 5.
+    const FOLDERS = [
+      { style: "grid",   label: "Grid",   count: 6 },
+      { style: "fan",    label: "Fan",    count: 5 },
+      { style: "column", label: "Column", count: 6 },
+    ];
+
+    // ── DOM ──
+    const stageWrap = document.getElementById("stageWrap");
+    const stage     = document.getElementById("stage");
+    const panelEl   = document.getElementById("panel");
+    const caption   = document.getElementById("caption");
+
+    // ── State ──
+    let activeIdx     = 0;      // which folder is expanded (or last-active)
+    let open          = false;
+    let scale         = 1;
+    let userTouched   = false;
+    let collapseTimer = null;
+    let hoverRegion   = null;  // {folder, panel} for keep-open hit test
+
+    // Derived from the active folder.
+    const styleOf  = () => FOLDERS[activeIdx].style;
+    const countOf  = () => FOLDERS[activeIdx].count;
+    const centerOf = () => ({ x: FOLDERS[activeIdx].x, y: FOLDERS[activeIdx].y });
+
+    // Lay the folders out in a row across the lower third of the stage, so their
+    // layouts mostly expand up and inward into the open space above. Build each
+    // folder element as we go (fixed position; no dragging).
+    const ROW_Y = 432, ROW_INSET = 150;
+    const FOLDER_SVG =
+      '<svg class="fico" viewBox="0 0 64 64" aria-hidden="true">' +
+      '<rect width="64" height="64" rx="14" fill="#7c8cff"/>' +
+      '<path d="M14 24a3 3 0 0 1 3-3h9l4 4h17a3 3 0 0 1 3 3v15a3 3 0 0 1-3 3H17a3 3 0 0 1-3-3z" fill="#fff"/>' +
+      '<g fill="#7c8cff"><rect x="20" y="31" width="6" height="6" rx="1.5"/><rect x="29" y="31" width="6" height="6" rx="1.5"/><rect x="38" y="31" width="6" height="6" rx="1.5"/></g>' +
+      '</svg>';
+    FOLDERS.forEach((f, i) => {
+      f.x = ROW_INSET + i * (STAGE_W - 2 * ROW_INSET) / (FOLDERS.length - 1);
+      f.y = ROW_Y;
+
+      const el = document.createElement("div");
+      el.className = "folder";
+      el.tabIndex = 0;
+      el.setAttribute("role", "button");
+      el.setAttribute("aria-label", f.label + " folder — hover or press to expand");
+      el.style.left = f.x + "px";
+      el.style.top  = f.y + "px";
+      el.innerHTML = FOLDER_SVG + '<div class="flbl">' + f.label + "</div>";
+      stage.appendChild(el);
+      f.el = el;
+
+      // Hover with a real pointer expands; touch/pen taps go through click so a
+      // tap doesn't expand-then-immediately-collapse.
+      el.addEventListener("pointerenter", e => {
+        if (e.pointerType === "mouse") { userTouched = true; cancelCollapse(); activeIdx = i; expand(); }
+      });
+      el.addEventListener("click", () => {
+        userTouched = true;
+        if (open && activeIdx === i) collapse();
+        else { activeIdx = i; expand(); }
+      });
+      el.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          userTouched = true;
+          if (open && activeIdx === i) collapse();
+          else { activeIdx = i; expand(); }
+        }
+      });
+    });
+
+    // Build a reusable pool of shortcut item elements (sized to the max count).
+    const items = APPS.map(app => {
+      const el = document.createElement("div");
+      el.className = "item";
+      el.innerHTML = `<div class="tile" style="background:${app.c};color:${textOn(app.c)}">${app.g}</div><div class="lbl">${app.t}</div>`;
+      stage.appendChild(el);
+      return el;
+    });
+
+    // ====================================================================
+    //  Pure-math helpers — direct ports of the C# Helpers/*.cs
+    // ====================================================================
+
+    // Helpers/StripWrapMath.cs → ItemsPerLine
+    function itemsPerLine(extent, cellSize, spacing) {
+      if (spacing <= 0 || extent <= cellSize) return 1;
+      return Math.max(1, Math.floor((extent - cellSize) / spacing) + 1);
+    }
+    // Helpers/StripWrapMath.cs → EmitLineMajor
+    function emitLineMajor(anchor, n, perLine, primary, line) {
+      perLine = Math.max(1, perLine);
+      const out = [];
+      for (let i = 0; i < n; i++) {
+        const L = Math.floor(i / perLine), s = i % perLine;
+        out.push({ x: anchor.x + L * line.x + s * primary.x,
+                   y: anchor.y + L * line.y + s * primary.y });
+      }
+      return out;
+    }
+    // Helpers/RingPositionMath.cs → ComputeRingCenter / ComputeAxis
+    function computeAxis(axis, halfExtent, rOuter, min, max) {
+      const ext = max - min;
+      if (ext < 2 * rOuter) return min + ext / 2;
+      if (axis - rOuter < min)  return clampC(axis + halfExtent + rOuter + 4, min + rOuter, max - rOuter);
+      if (axis + rOuter > max)  return clampC(axis - halfExtent - rOuter - 4, min + rOuter, max - rOuter);
+      return axis;
+    }
+    function computeRingCenter(c, ringRadius, halfCell, iconCell, area) {
+      const rOuter = ringRadius + halfCell * Math.SQRT2 + PADDING;
+      return {
+        x: computeAxis(c.x, iconCell.w / 2, rOuter, area.left, area.right),
+        y: computeAxis(c.y, iconCell.h / 2, rOuter, area.top,  area.bottom),
+      };
+    }
+    const clampC = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
+
+    // Smart expand direction for Grid/Fan: the vertical side with more room
+    // (the app's WindowPositioning biases to up/down; column/row & ring pick
+    // their own side internally, so this only feeds Grid and Fan).
+    function vDir(c, b) { return (b.bottom - c.y) > (c.y - b.top) ? "Down" : "Up"; }
+
+    // ====================================================================
+    //  Style ports — each returns { positions: [{x,y}], placement, half }
+    // ====================================================================
+
+    // GridExpandStyle.cs
+    function gridLayout(c, n, b) {
+      const dir = vDir(c, b);
+      const cz = gridCell(ICON);
+      const calcCols = k => k === 0 ? 1 : k <= 4 ? Math.ceil(Math.sqrt(k)) : Math.min(Math.ceil(Math.sqrt(k)), 6);
+      const columns = calcCols(n);
+      const rows = Math.min(Math.ceil(n / columns), 6);
+      const visible = Math.min(n, columns * rows);
+      const pw = columns * cz, ph = rows * cz;
+      let left = c.x - pw / 2;
+      // Up: lift so the bottom row's icons sit on UP_BASELINE (matches Column).
+      let top  = dir === "Down" ? c.y + ICON / 2 + 4 : c.y - UP_BASELINE - ph + cz / 2;
+      left = Math.max(b.left, Math.min(left, b.right - pw));
+      top  = Math.max(b.top,  Math.min(top,  b.bottom - ph));
+      const positions = [];
+      for (let i = 0; i < visible; i++) {
+        const col = i % columns, row = Math.floor(i / columns);
+        positions.push({ x: left + col * cz + cz / 2, y: top + row * cz + cz / 2 });
+      }
+      return { positions, placement: dir, half: cz / 2 };
+    }
+
+    // FanExpandStyle.cs
+    function fanLayout(c, n, b) {
+      const dir = vDir(c, b);
+      const r = cell(ICON) * 140 / 90;
+      const centerAngle = dir === "Up" ? 270 : dir === "Down" ? 90 : dir === "Left" ? 180 : 0;
+      // The app adapts the sweep to the shortcut count (widening up to ~140°,
+      // then growing the radius); the demo uses a fixed modest sweep so the
+      // arc's lowest icons lift clear of the collapsed folder in this small mock.
+      const sweep = 120, start = centerAngle - sweep / 2;
+      const step = n > 1 ? sweep / (n - 1) : 0;
+      // Up: raise the arc's centre so its lowest icons land on UP_BASELINE,
+      // matching the bottom edge of the Column layout.
+      const cy = dir === "Up" ? c.y - UP_BASELINE + r * Math.cos(sweep / 2 * Math.PI / 180) : c.y;
+      const positions = [];
+      for (let i = 0; i < n; i++) {
+        const a = (n > 1 ? start + i * step : centerAngle) * Math.PI / 180;
+        positions.push({ x: c.x + r * Math.cos(a), y: cy + r * Math.sin(a) });
+      }
+      return { positions, placement: dir, half: cell(ICON) / 2 };
+    }
+
+    // ColumnExpandStyle.cs  (vertical column that wraps into columns)
+    function columnLayout(c, n, b) {
+      const cz = cell(ICON), spacing = cz + 4;
+      const hOff = FOLDER_CELL.w / 2 + cz / 2 + 14;
+      const vOff = FOLDER_CELL.h / 2 + cz / 2 + 14;
+      const sRight = b.right - c.x, sLeft = c.x - b.left, sBelow = b.bottom - c.y, sAbove = c.y - b.top;
+      const ipcUp   = itemsPerLine(sAbove - vOff, cz, spacing);
+      const ipcDown = itemsPerLine(sBelow - vOff, cz, spacing);
+      const ipcSide = itemsPerLine(b.height, cz, spacing);
+      const canUp = sAbove >= vOff + cz / 2, canDown = sBelow >= vOff + cz / 2;
+      const canRight = sRight >= hOff + cz / 2, canLeft = sLeft >= hOff + cz / 2;
+
+      let placement;
+      if (canUp && ipcUp >= n) placement = "Up";
+      else if (canDown && ipcDown >= n) placement = "Down";
+      else if (canUp || canDown) placement = (canUp && (!canDown || ipcUp >= ipcDown)) ? "Up" : "Down";
+      else if (canRight) placement = "Right";
+      else if (canLeft) placement = "Left";
+      else placement = "Up";
+
+      const ipc = placement === "Up" ? ipcUp : placement === "Down" ? ipcDown : ipcSide;
+      const anchorN = Math.min(ipc, n);
+      const wrapSign = placement === "Left" ? -1 : 1;
+
+      let ax, ay;
+      if (placement === "Up")        { ax = c.x; ay = c.y - vOff - (anchorN - 1) * spacing; }
+      else if (placement === "Down") { ax = c.x; ay = c.y + vOff; }
+      else if (placement === "Right"){ ax = c.x + hOff; ay = c.y - (anchorN - 1) * spacing / 2; }
+      else                           { ax = c.x - hOff; ay = c.y - (anchorN - 1) * spacing / 2; }
+
+      const colSpan = (anchorN - 1) * spacing;
+      ay = Math.max(b.top + cz / 2, Math.min(ay, b.bottom - colSpan - cz / 2));
+
+      if (placement === "Up" || placement === "Down") {
+        const cols = Math.ceil(n / Math.max(1, ipc));
+        const overflow = (ax + (cols - 1) * spacing + cz / 2) - b.right;
+        if (overflow > 0) ax -= cols >= 2 ? Math.ceil(overflow / spacing) * spacing : overflow;
+        ax = Math.max(ax, b.left + cz / 2);
+      }
+
+      const positions = emitLineMajor({ x: ax, y: ay }, n, ipc, { x: 0, y: spacing }, { x: wrapSign * spacing, y: 0 });
+      return { positions, placement, half: cz / 2 };
+    }
+
+    // RingExpandStyle.cs  (kept for parity; not one of the row's folders)
+    function ringLayout(c, n, b) {
+      const cz = cell(ICON), radius = cz * 120 / 90, halfCell = cz / 2;
+      const center = computeRingCenter(c, radius, halfCell, FOLDER_CELL, b);
+      let positions;
+      if (n === 1) positions = [{ x: center.x, y: center.y - radius }];
+      else {
+        positions = [];
+        const step = 360 / n;
+        for (let i = 0; i < n; i++) {
+          const a = (-90 + i * step) * Math.PI / 180;
+          positions.push({ x: center.x + radius * Math.cos(a), y: center.y + radius * Math.sin(a) });
+        }
+      }
+      return { positions, placement: "Ring", half: halfCell, ringCenter: center, ringRadius: radius };
+    }
+
+    function computeLayout() {
+      const b = { left: 0, top: 0, right: STAGE_W, bottom: STAGE_H, width: STAGE_W, height: STAGE_H };
+      const c = centerOf(), n = countOf();
+      switch (styleOf()) {
+        case "grid":   return gridLayout(c, n, b);
+        case "fan":    return fanLayout(c, n, b);
+        case "column": return columnLayout(c, n, b);
+        case "ring":   return ringLayout(c, n, b);
+      }
+    }
+
+    // ====================================================================
+    //  Rendering
+    // ====================================================================
+    function render(animate) {
+      const L = computeLayout();
+      const pos = L.positions;
+      const c = centerOf(), n = countOf();
+
+      if (!animate) stage.classList.add("no-anim");
+
+      // The active folder floats above its siblings, which recede while a
+      // layout is open so the expansion reads cleanly over the row.
+      FOLDERS.forEach((f, i) => {
+        const isActive = i === activeIdx;
+        f.el.classList.toggle("active", isActive && open);
+        f.el.style.opacity = (open && !isActive) ? "0.22" : "1";
+        f.el.style.zIndex  = isActive ? "6" : "5";
+      });
+
+      // Panel backdrop + keep-open hit region.
+      let region;
+      if (styleOf() === "ring") {
+        let r = 0;
+        for (const p of pos) r = Math.max(r, Math.hypot(p.x - L.ringCenter.x, p.y - L.ringCenter.y));
+        r += L.half + PADDING;
+        sizeCircle(panelEl, L.ringCenter.x, L.ringCenter.y, r);
+        region = { kind: "circle", x: L.ringCenter.x, y: L.ringCenter.y, r: r + 10 };
+      } else {
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        for (const p of pos) {
+          minX = Math.min(minX, p.x - L.half); minY = Math.min(minY, p.y - L.half);
+          maxX = Math.max(maxX, p.x + L.half); maxY = Math.max(maxY, p.y + L.half);
+        }
+        const x = minX - PADDING, y = minY - PADDING, w = (maxX - minX) + 2 * PADDING, h = (maxY - minY) + 2 * PADDING;
+        sizeRect(panelEl, x, y, w, h);
+        region = { kind: "rect", x: x - 10, y: y - 10, w: w + 20, h: h + 20 };
+      }
+      hoverRegion = {
+        panel: region,
+        folder: { kind: "rect", x: c.x - FOLDER_CELL.w / 2, y: c.y - FOLDER_CELL.h / 2, w: FOLDER_CELL.w, h: FOLDER_CELL.h },
+      };
+
+      // Place each item; collapsed items are pulled back toward the active folder.
+      items.forEach((el, i) => {
+        if (i >= n) { el.style.opacity = "0"; el.style.pointerEvents = "none"; el.hidden = true; return; }
+        el.hidden = false; el.style.pointerEvents = open ? "auto" : "none";
+        const t = pos[i];
+        el.style.left = t.x + "px";
+        el.style.top  = t.y + "px";
+        const dx = c.x - t.x, dy = c.y - t.y;
+        const delay = open ? i * 0.028 : (n - 1 - i) * 0.022;
+        el.style.transitionDelay = animate ? delay + "s" : "0s";
+        if (open) {
+          el.style.transform = "translate(-50%, -50%) scale(1)";
+          el.style.opacity = "1";
+        } else {
+          el.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(.45)`;
+          el.style.opacity = "0";
+        }
+      });
+
+      stage.classList.toggle("open", open);
+      updateCaption(L.placement);
+
+      if (!animate) {
+        // Re-enable transitions on the next frame so future changes animate.
+        // eslint-disable-next-line no-unused-expressions
+        stage.offsetHeight;
+        requestAnimationFrame(() => stage.classList.remove("no-anim"));
+      }
+    }
+
+    function sizeRect(el, x, y, w, h) {
+      el.style.left = x + "px"; el.style.top = y + "px";
+      el.style.width = w + "px"; el.style.height = h + "px";
+      el.style.borderRadius = "18px";
+    }
+    function sizeCircle(el, cx, cy, r) {
+      el.style.left = (cx - r) + "px"; el.style.top = (cy - r) + "px";
+      el.style.width = (2 * r) + "px"; el.style.height = (2 * r) + "px";
+      el.style.borderRadius = "50%";
+    }
+
+    const ARROW = { Up: "▲ upward", Down: "▼ downward", Left: "◀ left", Right: "▶ right" };
+    const STYLE_NAME = { grid: "Grid", fan: "Fan", column: "Column", ring: "Ring" };
+    function updateCaption(placement) {
+      if (!open) { caption.innerHTML = "Hover a folder to expand its layout."; return; }
+      const where = placement === "Ring" ? "encircles the folder" : "expands " + (ARROW[placement] || "");
+      caption.innerHTML = `<b>${STYLE_NAME[styleOf()]}</b> — ${where}.`;
+    }
+
+    // ====================================================================
+    //  Open / close
+    // ====================================================================
+    function expand(animate = true) { open = true; render(animate); }
+    function collapse(animate = true) { open = false; render(animate); clearTimeout(collapseTimer); }
+
+    function scheduleCollapse() {
+      clearTimeout(collapseTimer);
+      collapseTimer = setTimeout(() => collapse(), 240);
+    }
+    function cancelCollapse() { clearTimeout(collapseTimer); }
+
+    // Hit-test a stage-space point against the keep-open region.
+    function inRegion(p) {
+      if (!hoverRegion) return false;
+      for (const reg of [hoverRegion.folder, hoverRegion.panel]) {
+        if (reg.kind === "rect") {
+          if (p.x >= reg.x && p.x <= reg.x + reg.w && p.y >= reg.y && p.y <= reg.y + reg.h) return true;
+        } else if (reg.kind === "circle") {
+          if (Math.hypot(p.x - reg.x, p.y - reg.y) <= reg.r) return true;
+        }
+      }
+      return false;
+    }
+
+    // Convert a client (screen) point into stage coordinates.
+    function toStage(clientX, clientY) {
+      const r = stage.getBoundingClientRect();
+      return { x: (clientX - r.left) / scale, y: (clientY - r.top) / scale };
+    }
+
+    // ====================================================================
+    //  Interaction — keep-open tracking on the stage
+    // ====================================================================
+    stage.addEventListener("mousemove", e => {
+      if (!open) return;
+      if (inRegion(toStage(e.clientX, e.clientY))) cancelCollapse();
+      else scheduleCollapse();
+    });
+    stage.addEventListener("mouseleave", () => { if (open) scheduleCollapse(); });
+
+    // ── Fit the logical stage into the card width ──
+    function fit() {
+      const avail = stageWrap.clientWidth || stage.parentElement.clientWidth;
+      scale = Math.min(1, avail / STAGE_W);
+      stage.style.transform = `scale(${scale})`;
+      stageWrap.style.width  = (STAGE_W * scale) + "px";
+      stageWrap.style.height = (STAGE_H * scale) + "px";
+    }
+    window.addEventListener("resize", fit);
+
+    // ── Boot ──
+    function textOn(hex) {
+      // pick black/white label for a tile colour by perceived luminance
+      const n = parseInt(hex.slice(1), 16);
+      const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+      return (0.299 * r + 0.587 * g + 0.114 * b) > 150 ? "#1a1d27" : "#ffffff";
+    }
+
+    fit();
+    render(false);                                   // start collapsed
+    // One-time autoplay (the first folder) so the page looks alive; cancelled
+    // if the user acts first, and skipped entirely when the visitor has asked
+    // for reduced motion (the page then waits for a real hover/tap).
+    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!reduceMotion) {
+      setTimeout(() => { if (!userTouched) { activeIdx = 0; expand(true); } }, 750);
+      setTimeout(() => { if (!userTouched) collapse(true); }, 2900);
+    }
+  })();
+  </script>
+
+</body>
+</html>

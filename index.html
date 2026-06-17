@@ -1,0 +1,837 @@
+<!doctype html>
+<!--
+  ============================================================================
+  DeskRipple landing page (Beta-Readiness-Checklist C2).
+  Self-contained: inline CSS + inline SVG, no build step, no framework, no
+  external dependencies except the brand images / screenshots in images/.
+  Host it on Cloudflare Pages (decided) — drag-and-drop the landing/ folder.
+
+  Keep in sync with Helpers/AppInfo.cs:
+    - Download asset:  DeskRipple-beta-Setup.exe  (version-less by design — the
+      /releases/latest/download/ URL stays valid on every release, B20).
+    - Version string:  v0.1.0 (beta)  — bump in the hero pill + footer per release.
+    - Feedback (Tally), Privacy, EULA links mirror AppInfo constants.
+  Voice rules (DeskRipple-Website-Context.md §7): plain, honest about the beta,
+  NEVER name a price, hedge the not-yet-fully-verified mixed-DPI claim.
+  ============================================================================
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>DeskRipple — Windows 11 desktop organizer &amp; folder dock</title>
+  <meta name="description" content="DeskRipple is a Windows 11 desktop folder dock: folder icons sit on your desktop and expand into shortcut panels on hover or click. Free public beta — no account, no subscription." />
+  <meta name="theme-color" content="#0b0e16" />
+  <link rel="canonical" href="https://deskripple.com/" />
+
+  <!-- Social / link-preview cards (Reddit, HN, X, Discord).
+       og:url and og:image MUST stay ABSOLUTE — scrapers don't resolve relative paths. -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="DeskRipple" />
+  <meta property="og:url" content="https://deskripple.com/" />
+  <meta property="og:title" content="DeskRipple — folders, right on your desktop" />
+  <meta property="og:description" content="A Windows 11 desktop folder dock. Folder icons sit behind your windows and expand into shortcut panels on hover or click. Free public beta." />
+  <meta property="og:image" content="https://deskripple.com/images/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="DeskRipple — a folder on the desktop fanning out into shortcut icons" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="DeskRipple — folders, right on your desktop" />
+  <meta name="twitter:description" content="A Windows 11 desktop folder dock. Folder icons expand into shortcut panels on hover or click. Free public beta." />
+  <meta name="twitter:image" content="https://deskripple.com/images/og-image.png" />
+  <meta name="twitter:image:alt" content="DeskRipple — a folder on the desktop fanning out into shortcut icons" />
+
+  <!-- PNG favicons derived from the DeskRipple logo mark (images/). -->
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16.png" />
+  <link rel="apple-touch-icon" href="images/favicon-180.png" />
+
+  <!-- Structured data for search. No price field by design (paid plan not announced). -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "DeskRipple",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Windows 11 (64-bit x64)",
+    "softwareVersion": "0.1.0",
+    "description": "DeskRipple is a Windows 11 desktop folder dock. Folder icons sit on the desktop and expand into shortcut panels on hover or click.",
+    "downloadUrl": "https://github.com/DeskRipple/deskripple/releases/latest/download/DeskRipple-beta-Setup.exe",
+    "url": "https://deskripple.com/",
+    "image": "https://deskripple.com/images/og-image.png",
+    "author": { "@type": "Organization", "name": "DeskRipple", "url": "https://deskripple.com/" }
+  }
+  </script>
+
+  <!-- FAQ structured data — mirrors the visible #faq section verbatim (Google requires the
+       answer text to be present on the page). Keep in sync with the FAQ markup below. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is DeskRipple free?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes — it's free during the public beta, with no account and no payment info required. A one-time paid version is planned for later, and beta testers get a founder discount when it ships. It's a one-time app, not a subscription." }
+      },
+      {
+        "@type": "Question",
+        "name": "I installed it but I don't see anything?",
+        "acceptedAnswer": { "@type": "Answer", "text": "DeskRipple runs from the system tray rather than a window, and on Windows 11 new tray icons start hidden in the overflow near the clock. Click the chevron, drag the DeskRipple icon onto the visible taskbar, then double-click it (or right-click and choose Open Manager) to add your first folder." }
+      },
+      {
+        "@type": "Question",
+        "name": "What happens after September 1, 2026?",
+        "acceptedAnswer": { "@type": "Answer", "text": "This beta build stops working after that date, so you'd switch to a newer build. With automatic updates left on, you'll always be on the latest one anyway — and the goal is to reach the paid launch with a fresh build before the beta expires." }
+      },
+      {
+        "@type": "Question",
+        "name": "Why might Windows SmartScreen warn me?",
+        "acceptedAnswer": { "@type": "Answer", "text": "DeskRipple is code-signed with Microsoft Trusted Signing, so Windows can verify the publisher — but it can still warn on a brand-new app that hasn't built download reputation yet. The prompt is milder than for unsigned software. Click More info, then Run anyway to continue." }
+      },
+      {
+        "@type": "Question",
+        "name": "Does it upload my desktop or my shortcuts?",
+        "acceptedAnswer": { "@type": "Answer", "text": "No. DeskRipple keeps its data locally in %APPDATA%. The only default network request is the GitHub update check. Anonymous diagnostics are opt-in and off by default, and the app works fully without them." }
+      },
+      {
+        "@type": "Question",
+        "name": "What happens to shortcuts I drag in from the desktop?",
+        "acceptedAnswer": { "@type": "Answer", "text": "By default they're moved — a tidier desktop is the point. The original is tucked into an archive folder, never deleted, and it comes right back when you remove the shortcut from DeskRipple or uninstall. Prefer to keep originals in place? Switch to Copy mode in Settings." }
+      },
+      {
+        "@type": "Question",
+        "name": "Is it a live folder mirror?",
+        "acceptedAnswer": { "@type": "Answer", "text": "No. DeskRipple keeps its own entries for the items you add, so a dock stays stable even if the original desktop shortcut is moved, renamed, or cleaned up." }
+      },
+      {
+        "@type": "Question",
+        "name": "Does it work on Windows 10?",
+        "acceptedAnswer": { "@type": "Answer", "text": "It's built and tested for Windows 11 (64-bit). Most of it works on Windows 10 22H2, but desktop-icon displacement and the acrylic backdrop are tuned for Windows 11, so 10 is unofficial and unsupported." }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I uninstall it?",
+        "acceptedAnswer": { "@type": "Answer", "text": "From Settings, Apps, Installed apps, like any program. It's a clean removal: it puts any archived desktop shortcuts back, removes its startup task, and deletes its data folder. Nothing is left behind." }
+      },
+      {
+        "@type": "Question",
+        "name": "Why will it become paid later?",
+        "acceptedAnswer": { "@type": "Answer", "text": "DeskRipple needs ongoing work for Windows updates, mixed-DPI setups, multi-monitor edge cases, and support. The plan is a one-time paid app — not a subscription — with a founder discount for beta testers." }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      /* Brand tokens — shared with playground.html (DeskRipple-Website-Context.md §4). */
+      --bg:        #0b0e16;   /* deep navy page background        */
+      --bg-soft:   #10141f;   /* lifted wells                    */
+      --panel:     rgba(255,255,255,.04);
+      --panel-2:   rgba(255,255,255,.055);
+      --panel-bd:  rgba(255,255,255,.10);
+      --panel-bd2: rgba(255,255,255,.16);
+      --text:      #e7eaf3;
+      --text-soft: #c8cee2;
+      --muted:     #9aa3b8;
+      --accent:    #7c8cff;   /* periwinkle — primary accent     */
+      --accent-2:  #58e6c9;   /* mint — gradient partner         */
+      --accent-3:  #b6c0ff;   /* link tint                       */
+      --btn-ink:   #0b0e16;   /* dark text on the gradient button (shared with playground) */
+      --warn-bg:   rgba(255,196,84,.10);
+      --warn-bd:   rgba(255,196,84,.35);
+      --warn-tx:   #ffce7a;
+      --shadow:    0 22px 70px rgba(0,0,0,.35);
+      --radius:    16px;
+      --radius-lg: 22px;
+      --maxw:      1080px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text);
+      /* Signature aurora: periwinkle top-right + mint top-left over deep navy. */
+      background:
+        radial-gradient(1200px 600px at 78% -8%, rgba(124,140,255,.20), transparent 60%),
+        radial-gradient(900px 520px at 8% 2%, rgba(88,230,201,.11), transparent 56%),
+        var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    a { color: var(--accent-3); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    a:focus-visible, button:focus-visible, summary:focus-visible {
+      outline: 3px solid rgba(88,230,201,.7);
+      outline-offset: 3px;
+      border-radius: 8px;
+    }
+    img { max-width: 100%; height: auto; }
+    code {
+      color: #dce2ff;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 6px;
+      padding: .06em .35em;
+      font-size: .9em;
+    }
+
+    .skip-link {
+      position: absolute; left: 14px; top: -52px; z-index: 100;
+      background: #fff; color: #0b0e16; font-weight: 700;
+      padding: 10px 14px; border-radius: 10px; transition: top .16s ease;
+    }
+    .skip-link:focus { top: 14px; }
+
+    .wrap { width: min(100% - 44px, var(--maxw)); margin: 0 auto; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px; margin: 0 0 12px;
+      color: var(--accent-2); font-size: .8rem; font-weight: 800;
+      letter-spacing: .09em; text-transform: uppercase;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-2); box-shadow: 0 0 18px rgba(88,230,201,.8); }
+
+    /* ---- nav ---- */
+    header {
+      position: sticky; top: 0; z-index: 30;
+      background: rgba(11,14,22,.66);
+      border-bottom: 1px solid var(--panel-bd);
+      backdrop-filter: blur(14px);
+    }
+    .nav { display: flex; align-items: center; justify-content: space-between; gap: 18px; height: 64px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--text); font-weight: 800; letter-spacing: -.01em; }
+    .brand:hover { text-decoration: none; }
+    .brand img { width: 30px; height: 30px; border-radius: 9px; box-shadow: 0 8px 26px rgba(124,140,255,.24); }
+    .nav-links { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; justify-content: flex-end; }
+    .nav-links a { color: var(--muted); font-size: .94rem; font-weight: 600; }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+    .nav-cta {
+      color: var(--btn-ink) !important; font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      padding: 9px 15px; border-radius: 999px;
+      box-shadow: 0 10px 30px rgba(88,230,201,.16);
+    }
+    .nav-cta:hover { text-decoration: none; }
+
+    /* ---- buttons ---- */
+    .btn-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      min-height: 48px; padding: 13px 20px; border-radius: 12px;
+      border: 1px solid transparent; font-weight: 700; font-size: 1rem; line-height: 1.1;
+      cursor: pointer; text-align: center;
+      transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+    .btn:hover { text-decoration: none; transform: translateY(-1px); }
+    .btn svg { width: 18px; height: 18px; flex: 0 0 auto; }
+    .btn-primary {
+      color: var(--btn-ink);
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 14px 40px rgba(124,140,255,.30);
+    }
+    .btn-ghost { color: var(--text); background: var(--panel-2); border-color: var(--panel-bd2); }
+    .btn-ghost:hover { border-color: rgba(124,140,255,.45); }
+
+    .sub { color: var(--muted); font-size: .9rem; }
+    .sub strong { color: var(--text-soft); font-weight: 700; }
+
+    /* ---- hero ---- */
+    main { overflow: hidden; }
+    .hero { padding: 70px 0 56px; }
+    .hero-grid { display: grid; grid-template-columns: minmax(0,1.02fr) minmax(320px,.98fr); gap: 46px; align-items: center; }
+    .beta-pill {
+      display: inline-flex; align-items: center; gap: 9px; margin: 0 0 18px;
+      color: var(--warn-tx); background: var(--warn-bg); border: 1px solid var(--warn-bd);
+      border-radius: 999px; padding: 7px 14px; font-size: .82rem; font-weight: 700; letter-spacing: .01em;
+    }
+    .hero h1 {
+      margin: 0; max-width: 12ch;
+      font-size: clamp(2.5rem, 6vw, 4.4rem); line-height: 1.0; letter-spacing: -.03em;
+      color: #dce3ff; /* solid fallback if background-clip:text is unavailable */
+      background: linear-gradient(180deg, #fff 8%, #dce3ff 48%, #aeb8d3 100%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-lede { margin: 22px 0 26px; max-width: 540px; color: var(--text-soft); font-size: clamp(1.05rem, 2vw, 1.24rem); }
+    .hero-lede strong { color: #fff; font-weight: 700; }
+    .under-cta { margin: 14px 0 0; max-width: 540px; }
+    .mini-proof { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; margin: 26px 0 0; max-width: 560px; }
+    .proof {
+      display: flex; gap: 10px; align-items: flex-start; padding: 12px 13px;
+      border: 1px solid var(--panel-bd); border-radius: 13px; background: var(--panel);
+      color: var(--muted); font-size: .88rem;
+    }
+    .proof svg { width: 18px; height: 18px; flex: 0 0 auto; color: var(--accent-2); margin-top: 1px; }
+    .proof b { color: var(--text); display: block; font-weight: 700; }
+
+    /* hero art — the real product, framed like a window */
+    .hero-art { position: relative; }
+    .window {
+      overflow: hidden; border: 1px solid var(--panel-bd2); border-radius: var(--radius-lg);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)), rgba(10,14,24,.7);
+      box-shadow: var(--shadow);
+    }
+    .window-bar { display: flex; align-items: center; gap: 8px; padding: 11px 14px; border-bottom: 1px solid var(--panel-bd); color: var(--muted); font-size: .82rem; }
+    .traffic { display: flex; gap: 6px; }
+    .traffic span { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,.22); }
+    .window-title { margin-left: 4px; }
+    .window-shot { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; background: var(--bg-soft); }
+    .float-note {
+      position: absolute; right: -6px; bottom: -18px; width: min(260px, 80%);
+      padding: 15px 16px; border-radius: 16px;
+      background: rgba(13,19,31,.9); border: 1px solid var(--panel-bd2);
+      box-shadow: 0 18px 50px rgba(0,0,0,.4); backdrop-filter: blur(14px);
+    }
+    .float-note b { display: block; margin-bottom: 4px; color: #fff; }
+    .float-note span { color: var(--muted); font-size: .9rem; }
+
+    /* ---- generic section ---- */
+    section { padding: 60px 0; }
+    /* keep in-page anchor jumps clear of the sticky header */
+    section[id], #main { scroll-margin-top: 80px; }
+    .head { max-width: 720px; margin: 0 0 32px; }
+    .head.center { margin-left: auto; margin-right: auto; text-align: center; }
+    h2 {
+      margin: 0; font-size: clamp(1.6rem, 3.2vw, 2.4rem); line-height: 1.1; letter-spacing: -.025em;
+      color: #cfd6e8; /* solid fallback if background-clip:text is unavailable */
+      background: linear-gradient(180deg, #fff, #b9c0d8); -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    h3 { margin: 0 0 6px; color: #fff; font-size: 1.08rem; line-height: 1.25; }
+    .section-sub { margin: 12px 0 0; color: var(--muted); font-size: 1.04rem; max-width: 660px; }
+    .center .section-sub { margin-left: auto; margin-right: auto; }
+
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 18px; }
+    .card {
+      position: relative; background: var(--panel); border: 1px solid var(--panel-bd);
+      border-radius: var(--radius); padding: 22px; transition: border-color .2s ease, transform .12s ease;
+    }
+    .card p { margin: 0; color: var(--muted); font-size: .96rem; }
+    .ico { width: 42px; height: 42px; border-radius: 11px; display: grid; place-items: center; margin-bottom: 14px; color: var(--accent); background: rgba(124,140,255,.13); border: 1px solid rgba(124,140,255,.22); }
+    .ico svg { width: 22px; height: 22px; }
+
+    /* ---- why ---- */
+    .why { border-top: 1px solid var(--panel-bd); border-bottom: 1px solid var(--panel-bd); background: linear-gradient(180deg, rgba(255,255,255,.02), transparent); }
+    .quote-card {
+      display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); gap: 26px; align-items: stretch;
+      padding: 30px; border: 1px solid var(--panel-bd); border-radius: var(--radius-lg);
+      background: radial-gradient(460px 240px at 18% 0%, rgba(124,140,255,.13), transparent 70%), var(--panel-2);
+    }
+    blockquote { margin: 0; color: #fff; font-size: clamp(1.25rem, 2.4vw, 1.7rem); line-height: 1.26; letter-spacing: -.02em; font-weight: 600; }
+    .quote-card p { margin: 14px 0 0; color: var(--muted); }
+    .quote-card p:first-of-type { margin-top: 0; }
+
+    /* ---- demo callout ---- */
+    .demo {
+      display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 22px;
+      padding: 26px; border-radius: var(--radius-lg); border: 1px solid rgba(88,230,201,.26);
+      background: radial-gradient(560px 240px at 6% 16%, rgba(88,230,201,.15), transparent 70%), rgba(88,230,201,.05);
+    }
+    .demo h2 { font-size: clamp(1.4rem, 2.8vw, 2rem); }
+    .demo p { margin: 9px 0 0; color: var(--text-soft); max-width: 680px; }
+
+    /* ---- steps ---- */
+    .step { padding-top: 22px; }
+    .step-num { position: absolute; top: 16px; right: 18px; color: rgba(255,255,255,.14); font-size: 2.2rem; font-weight: 900; letter-spacing: -.05em; }
+
+    /* ---- features ---- */
+    .feat { min-height: 196px; }
+    .feat:hover { border-color: rgba(124,140,255,.32); transform: translateY(-2px); }
+
+    /* ---- screenshots ---- */
+    .shots { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 18px; }
+    .shot { margin: 0; overflow: hidden; border-radius: var(--radius); border: 1px solid var(--panel-bd); background: var(--bg-soft); box-shadow: 0 18px 50px rgba(0,0,0,.18); }
+    .shot-wrap { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: repeating-linear-gradient(45deg, rgba(255,255,255,.03) 0 12px, transparent 12px 24px), rgba(255,255,255,.03); }
+    .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .shot-ph { display: none; position: absolute; inset: 0; flex-direction: column; align-items: center; justify-content: center; gap: 9px; text-align: center; padding: 18px; color: var(--muted); }
+    .shot-ph svg { width: 32px; height: 32px; opacity: .6; }
+    figcaption { padding: 13px 16px 16px; color: var(--text-soft); font-size: .95rem; }
+    figcaption span { display: block; color: var(--muted); font-size: .87rem; margin-top: 3px; }
+
+    /* ---- trust ---- */
+    .trust-band { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; margin: 0 0 22px; }
+    .chip { padding: 14px 15px; border-radius: 14px; background: var(--panel); border: 1px solid var(--panel-bd); color: var(--muted); font-size: .9rem; }
+    .chip b { display: block; color: #fff; margin-bottom: 2px; }
+    .warn { display: flex; gap: 14px; align-items: flex-start; padding: 18px; border-radius: var(--radius); background: var(--warn-bg); border: 1px solid var(--warn-bd); color: var(--warn-tx); }
+    .warn svg { width: 24px; height: 24px; margin-top: 1px; flex: 0 0 auto; }
+    .warn b { color: #ffe0ad; }
+    .ticks { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 10px; }
+    .ticks li { display: flex; gap: 10px; color: var(--muted); }
+    .ticks li::before { content: ""; width: 7px; height: 7px; margin-top: .55em; border-radius: 50%; background: var(--accent-2); flex: 0 0 auto; }
+
+    /* ---- requirements ---- */
+    .req-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
+    .req { padding: 18px; border-radius: 15px; background: var(--panel); border: 1px solid var(--panel-bd); }
+    .req b { display: block; color: #fff; font-size: 1.02rem; margin-bottom: 4px; }
+    .req span { color: var(--muted); font-size: .89rem; }
+
+    /* ---- faq ---- */
+    .faq-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; align-items: start; }
+    details { border: 1px solid var(--panel-bd); border-radius: 15px; background: var(--panel); }
+    summary { cursor: pointer; padding: 16px 18px; color: #fff; font-weight: 700; }
+    details p { margin: 0; padding: 0 18px 18px; color: var(--muted); }
+    details p + p { padding-top: 12px; }
+
+    /* ---- download ---- */
+    .download-panel {
+      position: relative; overflow: hidden; border-radius: var(--radius-lg); border: 1px solid var(--panel-bd2);
+      background: radial-gradient(680px 280px at 12% 0%, rgba(124,140,255,.18), transparent 70%), radial-gradient(520px 220px at 86% 30%, rgba(88,230,201,.12), transparent 72%), var(--panel-2);
+      padding: 32px; box-shadow: var(--shadow);
+    }
+    .download-panel h2 { max-width: 740px; }
+    .download-panel .btn-row { margin-top: 22px; }
+    .fine { margin-top: 18px; color: var(--muted); font-size: .9rem; max-width: 860px; }
+    .portable { margin-top: 12px; color: var(--muted); font-size: .88rem; }
+
+    /* ---- footer ---- */
+    footer { border-top: 1px solid var(--panel-bd); padding: 38px 0; color: var(--muted); font-size: .9rem; }
+    .foot-grid { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 22px; align-items: start; }
+    .foot-links { display: flex; gap: 18px; flex-wrap: wrap; justify-content: flex-end; }
+    .foot-links a { color: var(--muted); }
+    .foot-links a:hover { color: var(--text); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+    }
+
+    @media (forced-colors: active) {
+      .hero h1, h2 { -webkit-text-fill-color: currentColor; color: CanvasText; }
+    }
+
+    @media (max-width: 960px) {
+      /* collapse the nav to brand + Download so the link row never wraps out of the header */
+      .nav { height: auto; min-height: 64px; }
+      .nav-links a:not(.nav-cta) { display: none; }
+      .hero-grid, .quote-card, .grid-2, .demo { grid-template-columns: 1fr; }
+      .hero { padding-top: 50px; }
+      .float-note { position: static; width: auto; margin-top: 16px; }
+      .grid-3, .shots, .trust-band, .req-grid, .faq-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .demo .btn-row { justify-content: flex-start; }
+    }
+    @media (max-width: 640px) {
+      .wrap { width: min(100% - 32px, var(--maxw)); }
+      .nav { padding: 12px 0; }
+      .hero { padding: 40px 0; }
+      section { padding: 44px 0; }
+      .mini-proof, .grid-3, .shots, .trust-band, .req-grid, .faq-grid { grid-template-columns: 1fr; }
+      .btn, .btn-row { width: 100%; }
+      .quote-card, .download-panel, .demo { padding: 22px; }
+      .foot-grid { grid-template-columns: 1fr; }
+      .foot-links { justify-content: flex-start; }
+    }
+  </style>
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- ============================ NAV ============================ -->
+  <header>
+    <div class="wrap nav">
+      <a class="brand" href="#main" aria-label="DeskRipple home">
+        <img src="images/favicon-180.png" width="30" height="30" alt="" aria-hidden="true" />
+        <span>DeskRipple</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#how">How it works</a>
+        <a href="#features">Features</a>
+        <a href="playground.html">Demo</a>
+        <a href="#screenshots">Screenshots</a>
+        <a href="#faq">FAQ</a>
+        <a href="https://github.com/DeskRipple/deskripple">GitHub</a>
+        <a class="nav-cta" href="#download">Download</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <!-- ============================ HERO ============================ -->
+    <section class="hero wrap" aria-labelledby="hero-title">
+      <div class="hero-grid">
+        <div>
+          <p class="beta-pill"><span class="dot" aria-hidden="true"></span> Free public beta · v0.1.0</p>
+          <h1 id="hero-title">Your folders, right on the desktop.</h1>
+          <p class="hero-lede">
+            DeskRipple is a <strong>Windows&nbsp;11 desktop folder dock</strong>. Folder icons sit behind your
+            windows like native desktop icons, then expand into tidy shortcut panels when you hover or click —
+            so you can clear the clutter without burying anything in a Start-menu folder.
+          </p>
+          <div class="btn-row">
+            <a class="btn btn-primary" href="https://github.com/DeskRipple/deskripple/releases/latest/download/DeskRipple-beta-Setup.exe">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+              Download the free beta
+            </a>
+            <a class="btn btn-ghost" href="playground.html">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3l14 9-14 9V3z"/></svg>
+              Try the browser demo
+            </a>
+          </div>
+          <p class="sub under-cta">
+            <strong>Windows&nbsp;11 (64-bit).</strong> Free during the beta, and auto-updates keep you on the
+            current build (this one stops working after <strong>September&nbsp;1,&nbsp;2026</strong>). A paid
+            version is planned later, with a founder discount for beta testers. By downloading you agree to the
+            <a href="https://github.com/DeskRipple/deskripple/blob/main/EULA.md">beta license (EULA)</a>.
+          </p>
+
+          <div class="mini-proof" role="group" aria-label="Highlights">
+            <div class="proof">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v5c0 4.5-3 7.5-8 9-5-1.5-8-4.5-8-9V7z"/><path d="M9 12l2 2 4-5"/></svg>
+              <span><b>Code-signed installer</b> Microsoft Trusted Signing</span>
+            </div>
+            <div class="proof">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h18"/><path d="M8 7l-5 5 5 5"/><path d="M16 7l5 5-5 5"/></svg>
+              <span><b>No subscription</b> One-time paid app planned later</span>
+            </div>
+            <div class="proof">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+              <span><b>Feels native</b> Snaps to the real desktop icon grid</span>
+            </div>
+            <div class="proof">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+              <span><b>Private by default</b> No account · diagnostics off</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-art">
+          <div class="window">
+            <div class="window-bar">
+              <div class="traffic" aria-hidden="true"><span></span><span></span><span></span></div>
+              <span class="window-title">Desktop — DeskRipple</span>
+            </div>
+            <img class="window-shot" src="images/screenshot-1.png" width="1600" height="1000"
+                 alt="A DeskRipple folder named Work expanded on the Windows desktop into a grid of app shortcuts, with collapsed folder docks down the left edge."
+                 loading="eager" />
+          </div>
+          <div class="float-note">
+            <b>Open only when you need it.</b>
+            <span>Hover or click a folder. Pick Grid, Fan, Column, Row, or Ring per folder.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ WHY ============================ -->
+    <section class="why" aria-labelledby="why-title">
+      <div class="wrap">
+        <div class="quote-card">
+          <div>
+            <p class="eyebrow"><span class="dot" aria-hidden="true"></span> Why it exists</p>
+            <h2 id="why-title">For people who actually use their desktop shortcuts.</h2>
+          </div>
+          <div>
+            <blockquote>&ldquo;My desktop was always either an icon wall, or a pile of shortcuts buried in Start-menu folders.&rdquo;</blockquote>
+            <p>DeskRipple is built by a solo developer to make desktop groups that live where your shortcuts already are — on the desktop. Each one takes up a single icon until you reach for it, then collapses out of the way.</p>
+            <p>It's for Windows users who want organization that feels native, stays light, and never turns into another subscription.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ DEMO CALLOUT ============================ -->
+    <section class="wrap" aria-labelledby="demo-title">
+      <div class="demo">
+        <div>
+          <p class="eyebrow"><span class="dot" aria-hidden="true"></span> No install required</p>
+          <h2 id="demo-title">Try the five expand styles in your browser.</h2>
+          <p>The demo lets you feel the core interaction first — Grid, Fan, Column, Row, and Ring. It's the fastest way to tell whether DeskRipple fits how you work.</p>
+        </div>
+        <div class="btn-row">
+          <a class="btn btn-primary" href="playground.html">Open the browser demo</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ HOW IT WORKS ============================ -->
+    <section id="how" class="wrap" aria-labelledby="how-title">
+      <div class="head center">
+        <p class="eyebrow"><span class="dot" aria-hidden="true"></span> How it works</p>
+        <h2 id="how-title">A dock that behaves like part of the desktop.</h2>
+        <p class="section-sub">It isn't a live folder mirror and it isn't an auto-sorter. It's a fast way to group the shortcuts, files, apps, and links you already reach for.</p>
+      </div>
+      <div class="grid-3">
+        <article class="card step">
+          <span class="step-num" aria-hidden="true">1</span>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></div>
+          <h3>Create a desktop dock</h3>
+          <p>Add a folder from the Manager, choose its expand style, and drop it onto your desktop icon grid.</p>
+        </article>
+        <article class="card step">
+          <span class="step-num" aria-hidden="true">2</span>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/></svg></div>
+          <h3>Drop your shortcuts in</h3>
+          <p>Drag in desktop shortcuts, files, web links, or Store apps. DeskRipple keeps its own copy, so entries don't break when the originals move.</p>
+        </article>
+        <article class="card step">
+          <span class="step-num" aria-hidden="true">3</span>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4l7 16 2-7 7-2z"/></svg></div>
+          <h3>Hover, click, launch</h3>
+          <p>The folder fans out the moment you reach for it, then collapses back to a single desktop icon when you're done.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============================ FEATURES ============================ -->
+    <section id="features" class="wrap" aria-labelledby="features-title">
+      <div class="head">
+        <p class="eyebrow"><span class="dot" aria-hidden="true"></span> Built for Windows 11 desktops</p>
+        <h2 id="features-title">The details that make it feel native.</h2>
+        <p class="section-sub">The hard parts are the ones you only notice when they go wrong: icon sizing, grid placement, mixed display scaling, and never losing a shortcut.</p>
+      </div>
+      <div class="grid-3">
+        <article class="card feat">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+          <h3>Real desktop placement</h3>
+          <p>Docks sit behind your windows like native desktop icons, snap to the live icon grid, and match the rendered icon size on each monitor.</p>
+        </article>
+        <article class="card feat">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+          <h3>Five expand styles</h3>
+          <p>Grid, Fan, Column, Row, and a full 360° Ring — with acrylic-blur panels and smooth open/close animations. Pick the layout per folder.</p>
+        </article>
+        <article class="card feat">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/></svg></div>
+          <h3>Drag &amp; drop anything</h3>
+          <p>Drop <code>.lnk</code> shortcuts, web links, files, or Microsoft Store apps straight in. DeskRipple keeps its own copy so a dock survives the original being moved or renamed.</p>
+        </article>
+        <article class="card feat">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/><path d="M18 15l3 3-3 3"/></svg></div>
+          <h3>Tidy desktop archiving</h3>
+          <p>Drag a desktop shortcut into a dock and the original tucks away safely. Remove it (or uninstall) and it comes right back — or switch to Copy mode to leave originals in place.</p>
+        </article>
+        <article class="card feat">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 7h12M8 12h12M8 17h12"/><path d="M3 7h.01M3 12h.01M3 17h.01"/></svg></div>
+          <h3>Native icons move aside</h3>
+          <p>Drop a dock onto a cell that's already taken and the native desktop icon politely shifts to the nearest free spot — nothing gets buried.</p>
+        </article>
+        <article class="card feat">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
+          <h3>Profiles for each setup</h3>
+          <p>Switch between named desktop setups — say Work and Home — without rebuilding your folders from scratch.</p>
+        </article>
+        <article class="card feat">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="9" height="7" rx="1"/><rect x="13" y="4" width="9" height="7" rx="1"/><rect x="2" y="14" width="20" height="6" rx="1"/></svg></div>
+          <h3>Multi-monitor &amp; mixed DPI</h3>
+          <p>Per-Monitor V2 aware — designed to keep docks crisp and correctly placed across displays running at different scales.</p>
+        </article>
+        <article class="card feat">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div>
+          <h3>Custom icons &amp; the Manager</h3>
+          <p>Create folders, set each one's expand behavior, and give it its own icon — all from a single Manager window.</p>
+        </article>
+        <article class="card feat">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v5c0 4.5-3 7.5-8 9-5-1.5-8-4.5-8-9V7z"/></svg></div>
+          <h3>Private &amp; self-contained</h3>
+          <p>No account, no trackers — data stays in <code>%APPDATA%</code>. One installer with no separate .NET and no admin rights, plus silent auto-updates you can switch off.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============================ SCREENSHOTS ============================ -->
+    <section id="screenshots" class="wrap" aria-labelledby="shots-title">
+      <div class="head center">
+        <p class="eyebrow"><span class="dot" aria-hidden="true"></span> See it in action</p>
+        <h2 id="shots-title">A cleaner desktop — without hiding your shortcuts.</h2>
+        <p class="section-sub">The desktop behavior, the expand styles, and the Manager where it all gets configured.</p>
+      </div>
+      <div class="shots">
+        <figure class="shot">
+          <div class="shot-wrap">
+            <img src="images/screenshot-1.png" alt="DeskRipple docks down the left of the desktop with the Work folder expanded into a grid of shortcuts"
+                 loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="shot-ph">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="M21 17l-5-5L5 19"/></svg>
+              <span>Screenshot unavailable</span>
+            </div>
+          </div>
+          <figcaption>A folder open on the desktop <span>Collapsed docks down the side; Work expanded as a Grid.</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <div class="shot-wrap">
+            <img src="images/screenshot-2.png" alt="The same folder shown in all five DeskRipple expand styles: Grid, Fan, Column, Row, and Ring"
+                 loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="shot-ph">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="M21 17l-5-5L5 19"/></svg>
+              <span>Screenshot unavailable</span>
+            </div>
+          </div>
+          <figcaption>Five layouts, one folder <span>Grid, Fan, Column, Row, and Ring.</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <div class="shot-wrap">
+            <img src="images/screenshot-3.png" alt="The DeskRipple Manager window showing profiles, a folder's expand-style dropdown, and its shortcut list"
+                 loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="shot-ph">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="M21 17l-5-5L5 19"/></svg>
+              <span>Screenshot unavailable</span>
+            </div>
+          </div>
+          <figcaption>The Manager <span>Create folders, choose styles, set each folder's icon.</span></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ============================ TRUST ============================ -->
+    <section class="wrap" aria-labelledby="trust-title">
+      <div class="head">
+        <p class="eyebrow"><span class="dot" aria-hidden="true"></span> Trust &amp; privacy</p>
+        <h2 id="trust-title">A brand-new desktop app should earn your trust.</h2>
+        <p class="section-sub">DeskRipple is honest about the beta, clear about privacy, and public about its releases on GitHub.</p>
+      </div>
+
+      <div class="trust-band">
+        <div class="chip"><b>Code-signed</b> Microsoft Trusted Signing</div>
+        <div class="chip"><b>No account</b> No sign-in or payment info</div>
+        <div class="chip"><b>Local data</b> Stored in <code>%APPDATA%</code></div>
+        <div class="chip"><b>Opt-in diagnostics</b> Anonymous, off by default</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="warn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.86l-8.1 14A2 2 0 0 0 3.94 21h16.12a2 2 0 0 0 1.74-3.14l-8.06-14a2 2 0 0 0-3.44 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+          <div>
+            <b>Windows SmartScreen may still warn you.</b><br />
+            DeskRipple is code-signed, but a brand-new app can still show &ldquo;Windows protected your PC&rdquo; until its download builds reputation. If it does, click <b>More info → Run anyway</b>. The prompt shows a verified publisher, and it fades as more people install it.
+          </div>
+        </div>
+        <div class="card">
+          <h3>What goes online?</h3>
+          <p>The app works fully without an account. The only default network traffic is the update check against GitHub — no identifiers, nothing about you or your setup. Anonymous diagnostics are sent only if you turn them on.</p>
+          <ul class="ticks">
+            <li>No ads, no third-party trackers.</li>
+            <li>No sign-in, no data sold or shared.</li>
+            <li>Public releases on GitHub for transparency (the app isn't open source).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ REQUIREMENTS ============================ -->
+    <section id="requirements" class="wrap" aria-labelledby="req-title">
+      <div class="head">
+        <p class="eyebrow"><span class="dot" aria-hidden="true"></span> Requirements</p>
+        <h2 id="req-title">Built for Windows 11, installed per user.</h2>
+        <p class="section-sub">The installer is self-contained — no separate .NET, WPF, or runtime to install.</p>
+      </div>
+      <div class="req-grid">
+        <div class="req"><b>Windows 11</b><span>64-bit (x64). Windows 10 is unofficial and may work.</span></div>
+        <div class="req"><b>4 GB RAM</b><span>8 GB recommended.</span></div>
+        <div class="req"><b>500 MB disk</b><span>The installed app plus its update cache.</span></div>
+        <div class="req"><b>Standard user</b><span>No admin rights required.</span></div>
+      </div>
+      <p class="sub" style="margin-top:16px">Full compatibility notes are in <a href="https://github.com/DeskRipple/deskripple/blob/main/SYSTEM_REQUIREMENTS.md">SYSTEM_REQUIREMENTS.md</a>.</p>
+    </section>
+
+    <!-- ============================ FAQ ============================ -->
+    <section id="faq" class="wrap" aria-labelledby="faq-title">
+      <div class="head center">
+        <p class="eyebrow"><span class="dot" aria-hidden="true"></span> FAQ</p>
+        <h2 id="faq-title">The things people ask before installing a new desktop app.</h2>
+      </div>
+      <div class="faq-grid">
+        <details open>
+          <summary>Is DeskRipple free?</summary>
+          <p>Yes — it's free during the public beta, with no account and no payment info required. A one-time paid version is planned for later, and beta testers get a founder discount when it ships. It's a one-time app, not a subscription.</p>
+        </details>
+        <details>
+          <summary>I installed it but I don't see anything?</summary>
+          <p>DeskRipple runs from the system tray rather than a window, and on Windows 11 new tray icons start hidden in the <code>^</code> overflow near the clock. Click the chevron, drag the DeskRipple icon onto the visible taskbar, then <b>double-click it</b> (or right-click → Open Manager) to add your first folder.</p>
+        </details>
+        <details>
+          <summary>What happens after September 1, 2026?</summary>
+          <p>This beta build stops working after that date, so you'd switch to a newer build. With automatic updates left on, you'll always be on the latest one anyway — and the goal is to reach the paid launch with a fresh build before the beta expires.</p>
+        </details>
+        <details>
+          <summary>Why might Windows SmartScreen warn me?</summary>
+          <p>DeskRipple is code-signed with Microsoft Trusted Signing, so Windows can verify the publisher — but it can still warn on a brand-new app that hasn't built download reputation yet. The prompt is milder than for unsigned software. Click <b>More info → Run anyway</b> to continue.</p>
+        </details>
+        <details>
+          <summary>Does it upload my desktop or my shortcuts?</summary>
+          <p>No. DeskRipple keeps its data locally in <code>%APPDATA%</code>. The only default network request is the GitHub update check. Anonymous diagnostics are opt-in and off by default, and the app works fully without them.</p>
+        </details>
+        <details>
+          <summary>What happens to shortcuts I drag in from the desktop?</summary>
+          <p>By default they're <b>moved</b> — a tidier desktop is the point. The original is tucked into an archive folder, never deleted, and it comes right back when you remove the shortcut from DeskRipple or uninstall. Prefer to keep originals in place? Switch to Copy mode in Settings.</p>
+        </details>
+        <details>
+          <summary>Is it a live folder mirror?</summary>
+          <p>No. DeskRipple keeps its own entries for the items you add, so a dock stays stable even if the original desktop shortcut is moved, renamed, or cleaned up.</p>
+        </details>
+        <details>
+          <summary>Does it work on Windows 10?</summary>
+          <p>It's built and tested for Windows 11 (64-bit). Most of it works on Windows 10 22H2, but desktop-icon displacement and the acrylic backdrop are tuned for Windows 11, so 10 is unofficial and unsupported.</p>
+        </details>
+        <details>
+          <summary>How do I uninstall it?</summary>
+          <p>From <b>Settings → Apps → Installed apps</b>, like any program. It's a clean removal: it puts any archived desktop shortcuts back, removes its startup task, and deletes its data folder. Nothing is left behind.</p>
+        </details>
+        <details>
+          <summary>Why will it become paid later?</summary>
+          <p>DeskRipple needs ongoing work for Windows updates, mixed-DPI setups, multi-monitor edge cases, and support. The plan is a one-time paid app — not a subscription — with a founder discount for beta testers.</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- ============================ DOWNLOAD ============================ -->
+    <section id="download" class="wrap" aria-labelledby="download-title">
+      <div class="download-panel">
+        <p class="eyebrow"><span class="dot" aria-hidden="true"></span> Download</p>
+        <h2 id="download-title">Install the free public beta.</h2>
+        <p class="section-sub">Run the installer and you're done — DeskRipple keeps itself up to date and uninstalls from Settings&nbsp;→&nbsp;Apps like any other program. Beta testers get a founder discount when it moves out of beta.</p>
+
+        <div class="warn" style="margin-top:22px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.86l-8.1 14A2 2 0 0 0 3.94 21h16.12a2 2 0 0 0 1.74-3.14l-8.06-14a2 2 0 0 0-3.44 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+          <div>
+            <b>Heads up:</b> DeskRipple is code-signed (Microsoft Trusted Signing), but because it's a brand-new app, Windows SmartScreen may still warn you the first time you run it. If the prompt appears, click <b>More info → Run anyway</b>.
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <a class="btn btn-primary" href="https://github.com/DeskRipple/deskripple/releases/latest/download/DeskRipple-beta-Setup.exe">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+            Download DeskRipple-beta-Setup.exe
+          </a>
+          <a class="btn btn-ghost" href="playground.html">Try the demo first</a>
+          <a class="btn btn-ghost" href="https://tally.so/r/eqzJZx">Send feedback</a>
+        </div>
+        <p class="portable">
+          Prefer not to run an installer? Grab the
+          <a href="https://github.com/DeskRipple/deskripple/releases/latest/download/DeskRipple-beta-Portable.zip">portable ZIP</a>
+          (extract and run) instead.
+        </p>
+        <p class="fine">
+          Windows&nbsp;11 (64-bit). Free during beta — this build stops working after <strong>September&nbsp;1,&nbsp;2026</strong>.
+          Auto-update is on during beta and can be turned off in Settings&nbsp;→&nbsp;Updates. By downloading you agree to the
+          <a href="https://github.com/DeskRipple/deskripple/blob/main/EULA.md">beta license (EULA)</a>.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================ FOOTER ============================ -->
+  <footer>
+    <div class="wrap foot-grid">
+      <div>
+        <strong style="color:var(--text)">DeskRipple</strong> · v0.1.0 (beta) · Windows&nbsp;11 desktop folder dock<br />
+        © 2026 · Free public beta · Use at your own risk during beta — no warranty.<br />
+        <span style="font-size:.82rem">Windows is a trademark of the Microsoft group of companies.</span>
+      </div>
+      <nav class="foot-links" aria-label="Footer">
+        <a href="playground.html">Browser demo</a>
+        <a href="https://github.com/DeskRipple/deskripple">GitHub</a>
+        <a href="https://github.com/DeskRipple/deskripple/blob/main/PRIVACY.md">Privacy</a>
+        <a href="https://github.com/DeskRipple/deskripple/blob/main/EULA.md">EULA</a>
+        <a href="https://tally.so/r/eqzJZx">Feedback</a>
+        <a href="mailto:support@deskripple.com">Contact</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>
