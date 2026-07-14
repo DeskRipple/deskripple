@@ -1,6 +1,6 @@
 # DeskRipple
 
-**Folder docks for your Windows 11 desktop.** DeskRipple puts folder icons right on
+**Folder docks for your Windows 10 and 11 desktop.** DeskRipple puts folder icons right on
 your desktop — sitting behind your windows like native icons — that expand on hover or
 click into a grid of shortcuts. Keep your desktop tidy without giving up one-click access.
 
@@ -13,6 +13,8 @@ It does not contain source code.
 ---
 
 ## Download & install
+
+**Runs on Windows 10 (22H2) and Windows 11, 64-bit** — no separate .NET runtime to install, and no admin rights needed.
 
 - **Installer (recommended):** [DeskRipple-beta-Setup.exe](https://github.com/DeskRipple/deskripple/releases/latest/download/DeskRipple-beta-Setup.exe) — installs per-user and keeps itself up to date automatically (you can turn that off in Settings).
 - **Portable ZIP:** [DeskRipple-beta-Portable.zip](https://github.com/DeskRipple/deskripple/releases/latest/download/DeskRipple-beta-Portable.zip)
