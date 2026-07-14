@@ -12,7 +12,7 @@ paste the relevant parts into the GitHub Release description.
 
 ## What is DeskRipple?
 
-DeskRipple is a Windows 11 desktop utility that lets you create folder-like **docks** directly
+DeskRipple is a Windows 10 and 11 desktop utility that lets you create folder-like **docks** directly
 on your desktop. Each dock sits behind your normal windows, like a native desktop icon. When
 you hover over or click it, it expands into a grid (or fan, column, row, or ring) of shortcuts to
 your apps, files, and folders.
@@ -36,7 +36,7 @@ working after **September 1, 2026** (see "Known Limitations").
 
 ## What are the system requirements?
 
-- **Windows 11**, 64-bit (x64)
+- **Windows 10 (22H2) or Windows 11**, 64-bit (x64)
 - No separate .NET install needed — the app is self-contained
 - No account, no login
 
@@ -77,7 +77,7 @@ quiet moment — it waits until you're not mid-drag, mid-menu, or working in an 
 then restarts the docks silently. A small tray notification tells you when a new version has
 landed; your folders and settings always carry over.
 
-Prefer to update on your own schedule? Turn off **Settings → Updates → "Install updates
+Prefer to update on your own schedule? Turn off **Manager → About → "Install updates
 automatically."** The only update traffic that remains is a single tiny check at launch, which
 exists so a seriously broken build can be flagged as "must update before running."
 
@@ -97,7 +97,7 @@ app) and it returns to your desktop. You can also right-click a shortcut in a do
 **Restore original to desktop** to bring the file back while keeping the dock entry.
 
 Prefer to keep originals where they are? Pick **"Copy it (keep the original on my desktop)"**
-under **Settings → Behavior → "When I add a shortcut from my desktop."** And you can browse the
+under **Settings → "When I add a shortcut from my desktop."** And you can browse the
 archived originals anytime — **Open Shortcuts Folder** (in the tray menu and in Settings) opens
 the archive in Explorer; it's a normal folder, so the shortcuts in it keep working even while
 DeskRipple isn't running.
@@ -169,7 +169,7 @@ left behind.
 DeskRipple is an early beta, so these are expected:
 
 - **Brand-new app** — DeskRipple is code-signed, but SmartScreen may still warn on first run until the download builds reputation (see above).
-- **Windows 11, 64-bit only.** No Windows 10 or ARM64 build.
+- **Windows 10 and 11, 64-bit only.** No 32-bit or ARM64 build.
 - **Time-limited beta build** — this beta expires on **September 1, 2026**; after that you'll
   need a newer build. With automatic updates on you'll always have the newest one anyway.
 - Behavior may vary across unusual **multi-monitor / mixed-DPI** setups; if something looks
