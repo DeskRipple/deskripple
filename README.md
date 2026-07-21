@@ -4,6 +4,10 @@
 your desktop — sitting behind your windows like native icons — that expand on hover or
 click into a grid of shortcuts. Keep your desktop tidy without giving up one-click access.
 
+![A DeskRipple folder icon on the Windows desktop expanding into a grid of shortcuts on hover, then collapsing back into a single icon](images/demo-grid.gif)
+
+*Grid is one of five expand styles — Grid, Column, Row, Fan, and a 360° Ring.*
+
 🌐 **Website & live demo:** <https://deskripple.com>
 ⬇️ **Download (free beta):** **[DeskRipple-beta-Setup.exe](https://github.com/DeskRipple/deskripple/releases/latest/download/DeskRipple-beta-Setup.exe)**
 
@@ -23,7 +27,7 @@ It does not contain source code.
 The build is code-signed, but a brand-new app can still trigger a Windows SmartScreen
 notice on first run — if you see one, choose **More info → Run anyway**.
 
-> ⚠️ **Free beta — this build stops working after September 1, 2026.** It is provided
+> ⚠️ **Free beta — this build stops working on September 1, 2026.** It is provided
 > **as-is** and you should expect rough edges. By downloading you agree to the
 > [beta license (EULA)](EULA.md).
 
