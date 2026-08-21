@@ -32,7 +32,7 @@ The beta is covered by a short beta license — the
 [EULA](https://github.com/DeskRipple/deskripple/blob/main/EULA.md). By downloading and using
 DeskRipple you agree to it. The headlines: the beta is provided **as-is** while in testing, it
 keeps itself updated automatically (see "How do updates work?" below), and this build stops
-working after **September 1, 2026** (see "Known Limitations").
+working on **September 1, 2026** (see "Known Limitations").
 
 ## What are the system requirements?
 
@@ -93,8 +93,7 @@ By default, DeskRipple **moves** them. Drag a `.lnk` or `.url` shortcut in from 
 and the original file is tucked into `%APPDATA%\DeskRipple\Desktop Shortcuts\` instead of
 staying behind as a duplicate — a tidier desktop is the whole point. Nothing is deleted, and
 the original comes back automatically: remove the shortcut from DeskRipple (or uninstall the
-app) and it returns to your desktop. You can also right-click a shortcut in a dock and choose
-**Restore original to desktop** to bring the file back while keeping the dock entry.
+app) and it returns to your desktop.
 
 Prefer to keep originals where they are? Pick **"Copy it (keep the original on my desktop)"**
 under **Settings → "When I add a shortcut from my desktop."** And you can browse the
