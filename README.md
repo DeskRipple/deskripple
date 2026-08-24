@@ -9,9 +9,9 @@ click into a grid of shortcuts. Keep your desktop tidy without giving up one-cli
 *Grid is one of five expand styles — Grid, Column, Row, Fan, and a 360° Ring.*
 
 🌐 **Website & live demo:** <https://deskripple.com>
-⬇️ **Download (free beta):** **[DeskRipple-beta-Setup.exe](https://github.com/DeskRipple/deskripple/releases/latest/download/DeskRipple-beta-Setup.exe)**
+⬇️ **Download:** **[DeskRipple-beta-Setup.exe](https://github.com/DeskRipple/deskripple/releases/latest/download/DeskRipple-beta-Setup.exe)** *(the `beta` in the file name is the update channel — it installs the current version)*
 
-This repository hosts the **public beta binaries and documentation** for DeskRipple.
+This repository hosts the **binaries and documentation** for DeskRipple.
 It does not contain source code.
 
 ---
@@ -20,23 +20,24 @@ It does not contain source code.
 
 **Runs on Windows 10 (22H2) and Windows 11, 64-bit** — no separate .NET runtime to install, and no admin rights needed.
 
-- **Installer (recommended):** [DeskRipple-beta-Setup.exe](https://github.com/DeskRipple/deskripple/releases/latest/download/DeskRipple-beta-Setup.exe) — installs per-user and keeps itself up to date automatically (you can turn that off in Settings).
+- **Installer (recommended):** [DeskRipple-beta-Setup.exe](https://github.com/DeskRipple/deskripple/releases/latest/download/DeskRipple-beta-Setup.exe) — installs per-user and keeps itself up to date automatically (you can turn that off in the app's About dialog).
 - **Portable ZIP:** [DeskRipple-beta-Portable.zip](https://github.com/DeskRipple/deskripple/releases/latest/download/DeskRipple-beta-Portable.zip)
 - **All releases:** <https://github.com/DeskRipple/deskripple/releases>
 
 The build is code-signed, but a brand-new app can still trigger a Windows SmartScreen
 notice on first run — if you see one, choose **More info → Run anyway**.
 
-> ⚠️ **Free beta — this build stops working on September 1, 2026.** It is provided
-> **as-is** and you should expect rough edges. By downloading you agree to the
-> [beta license (EULA)](EULA.md).
+> 🔑 **DeskRipple is a one-time purchase, not a subscription.** Without a license key, it
+> stops working on **September 1, 2026** — buy once at <https://deskripple.com>, enter the key
+> under **Manager → About**, and there's no expiry. By downloading you agree to the
+> [license agreement (EULA)](EULA.md).
 
 ## Documentation
 
 - 🖥️ [System requirements](SYSTEM_REQUIREMENTS.md) — what you need to run it
-- ❓ [Beta FAQ &amp; known limitations](BETA-FAQ.md) — install, uninstall, updates, gotchas
+- ❓ [FAQ &amp; known limitations](FAQ.md) — cost, license keys, install, uninstall, updates, gotchas
 - 🔒 [Privacy policy](PRIVACY.md) — what's collected (opt-in, off by default)
-- 📄 [EULA](EULA.md) — the beta license you accept on install
+- 📄 [EULA](EULA.md) — the license agreement you accept on install
 - 📝 [Third-party notices](THIRD-PARTY-NOTICES.txt) — open-source components
 
 ## Feedback
