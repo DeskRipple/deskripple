@@ -3,7 +3,7 @@
 
 # DeskRipple — End User License Agreement
 
-**Version 2 — applies to DeskRipple 1.0 and later, unless a later agreement is presented and accepted. Effective date: <<LAUNCH DATE — fill on the day 1.0 goes on sale>>.**
+**Version 2 — applies to DeskRipple 1.0 and later, unless a later agreement is presented and accepted. Effective date: August 24, 2026.**
 
 *(This agreement replaces the beta license for version 1.0 onward. The beta terms are archived as `EULA-BETA.md`; beta builds remain governed by them until the beta stops working on September 1, 2026.)*
 
