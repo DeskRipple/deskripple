@@ -1,6 +1,6 @@
 # DeskRipple Privacy Policy
 
-**Effective date:** 2026-08-24
+**Effective date:** 2026-08-28
 **Applies to:** DeskRipple for Windows (all versions)
 
 > This is DeskRipple's privacy policy, in plain language. It covers the app itself and what happens when you buy a license.
@@ -102,7 +102,7 @@ DeskRipple includes optional, anonymous usage diagnostics so we can understand w
 - counts, since the last summary, of internal self-checks and recoveries: how often DeskRipple pushed a folder icon back to its place behind your windows, fell back to a default desktop-icon size because it couldn't measure yours, recovered a folder's custom icon after its source file went missing, and re-linked its own files after its data folder was moved or renamed;
 - how quickly folders open, as counts in coarse speed buckets (e.g. "under 50 ms");
 - counts of errors and crashes since the last summary, with the type names of the most common errors (e.g. "InvalidOperationException") — never error messages, stack traces, or paths;
-- counts of automatic-update attempts and how many failed, by stage (check / download / install).
+- counts of automatic-update attempts and how many failed, by stage (check / download / install), plus a coarse label for what kind of failure it was (for example "timeout", "dns", or "http403") — always one of a short fixed list of labels, never an error message, URL, or host name.
 
 **What it never sends.** It never includes your folder names, the names, paths, or contents of your shortcuts or files, your username or computer name, screenshots, or anything you type. There is no advertising or cross-site tracking, and the data is never sold or shared.
 
