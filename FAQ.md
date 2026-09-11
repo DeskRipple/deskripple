@@ -53,12 +53,23 @@ Lost the key later? The link in your receipt keeps working, and
 [support@deskripple.com](mailto:support@deskripple.com) can look an order up from the order
 number or the checkout email address.
 
-## What happens on September 1, 2026?
+## Can I try it before I buy?
 
-Without a license key, DeskRipple stops working on that date — enter a key and there's no
-expiry. (Installs made before that date ran free until it, as promised during the public beta.)
-If you stop using DeskRipple instead, removing entries or uninstalling restores your archived
-desktop shortcuts, so nothing is lost either way.
+Yes. **Try DeskRipple free for 14 days, with every feature included. No account or payment
+details are required to start.** If it fits your workflow, DeskRipple is a one-time purchase,
+not a subscription. When the 14 days are up, DeskRipple shows a license screen. Enter a key
+once, under Manager → About or on that screen, and there's no expiry. If you stop using
+DeskRipple instead, removing entries or uninstalling restores your archived desktop shortcuts,
+so nothing is lost either way. If you'd rather not install anything yet, the
+[browser demo](https://deskripple.com/playground.html) shows the interaction.
+
+**Installed during the public beta, or on version 1.0.0?** A beta install had the free run the
+beta disclosed: without a license key, DeskRipple stops working on September 1, 2026, and a key
+entered on the license screen unlocks it in place. A 1.0.0 install stops at the license screen
+from that date until it updates (click "Get the latest version" there); what is left of its 14
+days, counted from its original installation rather than from the update, then continues, and if
+nothing is left it goes straight back to the license screen. Either way, that screen restores
+archived desktop shortcuts without a purchase. (The EULA states both rules in section 5.)
 
 ## What are the system requirements?
 
@@ -200,8 +211,8 @@ left behind.
 
 - **Newer app** — DeskRipple is code-signed, but SmartScreen may still warn on first run until the download builds reputation (see above).
 - **Windows 10 and 11, 64-bit only.** No 32-bit or ARM64 build.
-- **A license key is needed from September 1, 2026** — without one, DeskRipple stops working on
-  that date. With a key there's no expiry.
+- **A license key is needed after 14 days** — DeskRipple runs for 14 days after you install it,
+  then needs a license key to keep working. With a key there's no expiry.
 - Behavior may vary across unusual **multi-monitor / mixed-DPI** setups; if something looks
   off at a particular display scale, that's exactly the kind of feedback that helps.
 - DeskRipple is code-signed, but some **antivirus tools** may still be cautious with a newer app until it's more widely seen.

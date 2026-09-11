@@ -3,7 +3,7 @@
 
 # DeskRipple — End User License Agreement
 
-**Version 2 — applies to DeskRipple 1.0 and later, unless a later agreement is presented and accepted. Effective date: August 24, 2026.**
+**Version 2 — applies to DeskRipple 1.0 and later, unless a later agreement is presented and accepted. Effective date: September 11, 2026 (section 5 revised for the 14-day trial that arrives with version 1.1.0; first effective August 24, 2026).**
 
 *(This agreement replaces the beta license for version 1.0 onward. The beta terms are archived as `EULA-BETA.md`; beta builds remain governed by them until the beta stops working on September 1, 2026.)*
 
@@ -23,7 +23,12 @@ By accepting this agreement when the Software presents it, or by installing or c
 
 4. **License keys.** Your key is available from the link in your receipt (and on the checkout confirmation): it opens the key page, which shows your key when given the order number and the email address used at checkout. The key is entered once in the Software (**Manager → About**). The Software verifies the key **on your PC, offline** — there is no account, no activation server, and no internet connection needed to stay licensed. Keep your key and your receipt: the key unlocks the Software; the receipt records your purchase and carries the order number that finds the key again. If you lose both, write to support@deskripple.com and the key will be recovered once the purchase is located.
 
-5. **Unlicensed use.** The Software may allow use without a license key for a limited period shown in the app. For the 1.0 release, unlicensed use stops working on September 1, 2026 (00:00 UTC) — the announced end date of the free beta. A valid license key is required from then on.
+5. **Unlicensed use.** The Software may allow use without a license key for a limited period shown in the app. Which period applies depends on the install:
+
+   - **Installs that ran the public beta** (a v0.x build): without a license key, DeskRipple stops working on September 1, 2026 (00:00 UTC) — the announced end date of the free beta.
+   - **Every other install, on version 1.1.0 or later:** DeskRipple runs for 14 days after you install it, then needs a license key to keep working. The 14 days are counted from the original installation; updating to a newer version does not restart them. An install of version 1.0.0 does not run without a license key from September 1, 2026 (00:00 UTC) until it is updated to version 1.1.0 or later; once updated, it runs for whatever remains of those 14 days.
+
+   Either way, a valid license key is required once the period ends. The 14 days in this section are the trial, counted from installation; the 14 days in section 6 are the refund window, counted from your purchase — two different periods.
 
 6. **Refunds — and what a refund does.** Every purchase can be refunded within 14 days, no questions asked; the refund is processed by the merchant of record, and the plain-language summary lives at deskripple.com/terms.html. **If your purchase is refunded or the payment is reversed through a chargeback, your license ends:** stop using the Software and uninstall it, or buy a new license. Because keys are verified offline, the Software may still accept a refunded key; technical acceptance does not restore the license.
 

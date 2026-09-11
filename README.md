@@ -27,10 +27,11 @@ It does not contain source code.
 The build is code-signed, but a brand-new app can still trigger a Windows SmartScreen
 notice on first run — if you see one, choose **More info → Run anyway**.
 
-> 🔑 **DeskRipple is a one-time purchase, not a subscription.** Without a license key, it
-> stops working on **September 1, 2026** — buy once at <https://deskripple.com>, enter the key
-> under **Manager → About**, and there's no expiry. By downloading you agree to the
-> [license agreement (EULA)](EULA.md).
+> 🔑 **DeskRipple is a one-time purchase, not a subscription.** DeskRipple runs for 14 days
+> after you install it, then needs a license key to keep working — buy once at
+> <https://deskripple.com>, enter the key under **Manager → About** or on the license screen,
+> and there's no expiry. DeskRipple asks you to accept the
+> [license agreement (EULA)](EULA.md) on first run.
 
 ## Documentation
 
