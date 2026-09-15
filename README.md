@@ -46,6 +46,8 @@ notice on first run — if you see one, choose **More info → Run anyway**.
 Hit a bug or have an idea? **[Send feedback](https://tally.so/r/eqzJZx)** or email
 **<support@deskripple.com>**.
 
+⭐ If DeskRipple is useful to you, starring this repository helps other Windows users find it.
+
 ## License
 
 **Proprietary software — © Michael Kline. All rights reserved.**
