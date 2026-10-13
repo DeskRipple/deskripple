@@ -26,10 +26,6 @@ local currency where supported. Every purchase can be refunded within **14 days,
 asked**. The readable purchase summary is the
 [terms of sale & refunds](https://deskripple.com/terms.html) page.
 
-<!-- FOUNDER-OFFER: retire with the founder window (PAID-LAUNCH-CHECKLIST section 7). -->
-**Tested the beta?** Beta testers get 50% off — the founder code is on the app's license screen
-and in the founder email.
-
 ## What are the license terms?
 
 The governing text is the [EULA](https://github.com/DeskRipple/deskripple/blob/main/EULA.md),
@@ -81,9 +77,9 @@ See [SYSTEM_REQUIREMENTS.md](https://github.com/DeskRipple/deskripple/blob/main/
 
 ## How do I install it?
 
-1. Download **`DeskRipple-beta-Setup.exe`** from [the latest release](https://github.com/DeskRipple/deskripple/releases/latest).
-   (The `beta` in the file name is the update channel's name, kept so existing installs keep
-   updating — the file installs the current version.)
+1. Download **`DeskRipple-Setup.exe`** from [the latest release](https://github.com/DeskRipple/deskripple/releases/latest).
+   (The release also lists `DeskRipple-beta-Setup.exe`. It is the same installer under the
+   update channel's name, kept for older links.)
 2. Double-click it. That's it — DeskRipple installs per-user (no admin prompt), adds a Start
    Menu entry, and starts automatically.
 

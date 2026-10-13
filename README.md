@@ -9,7 +9,7 @@ click into a grid of shortcuts. Keep your desktop tidy without giving up one-cli
 *Grid is one of five expand styles — Grid, Column, Row, Fan, and a 360° Ring.*
 
 🌐 **Website & live demo:** <https://deskripple.com>
-⬇️ **Download:** **[DeskRipple-beta-Setup.exe](https://github.com/DeskRipple/deskripple/releases/latest/download/DeskRipple-beta-Setup.exe)** *(the `beta` in the file name is the update channel — it installs the current version)*
+⬇️ **Download:** **[DeskRipple-Setup.exe](https://github.com/DeskRipple/deskripple/releases/latest/download/DeskRipple-Setup.exe)**
 
 This repository hosts the **binaries and documentation** for DeskRipple.
 It does not contain source code.
@@ -20,8 +20,8 @@ It does not contain source code.
 
 **Runs on Windows 10 (22H2) and Windows 11, 64-bit** — no separate .NET runtime to install, and no admin rights needed.
 
-- **Installer (recommended):** [DeskRipple-beta-Setup.exe](https://github.com/DeskRipple/deskripple/releases/latest/download/DeskRipple-beta-Setup.exe) — installs per-user and keeps itself up to date automatically (you can turn that off in the app's About dialog).
-- **Portable ZIP:** [DeskRipple-beta-Portable.zip](https://github.com/DeskRipple/deskripple/releases/latest/download/DeskRipple-beta-Portable.zip)
+- **Installer (recommended):** [DeskRipple-Setup.exe](https://github.com/DeskRipple/deskripple/releases/latest/download/DeskRipple-Setup.exe) — installs per-user and keeps itself up to date automatically (you can turn that off in the app's About dialog).
+- **Portable ZIP:** [DeskRipple-Portable.zip](https://github.com/DeskRipple/deskripple/releases/latest/download/DeskRipple-Portable.zip)
 - **All releases:** <https://github.com/DeskRipple/deskripple/releases>
 
 The build is code-signed, but a brand-new app can still trigger a Windows SmartScreen
